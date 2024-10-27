@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  phoneNumber BigInt    @unique
+  firstName   String
+  lastName    String
+  onBoarding  Boolean   @default(false)
+  addresses   Address[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now())
+  isActive    Boolean   @default(true)
+  lastLogin   DateTime  @default(now())
+  role        Role      @default(CUSTOMER)
+  dateOfBirth DateTime?
+  avatarUrl   String?
+}
+
+model Address {
+  id                  String      @id @default(uuid())
+  customer            Customer    @relation(fields: [customerId], references: [id])
+  customerId          String
+  isDefault           Boolean     @default(false)
+  addressType         AddressType @default(HOUSE)
+  phoneNumber         BigInt
+  pincode             Int
+  addressLine1        String
+  addressLine2        String?
+  landmark            String
+  city                String
+  state               String
+  deliverOnSaturday   Boolean     @default(true)
+  deliverOnSunday     Boolean     @default(true)
+  deliveryInstruction String?
+}
+
+// Enums
+
+enum Role {
+  CUSTOMER
+  SELLER
+}
+
+enum AddressType {
+  HOUSE
+  APARTMENT
+  OFFICE
+  OTHER
+}
